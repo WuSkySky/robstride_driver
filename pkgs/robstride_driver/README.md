@@ -32,4 +32,5 @@ sudo ifconfig can0 txqueuelen 100
 colcon build 
 source ./install/setup.bash
 ros2 run rs_motor_ros2 rs_motor_ros2
+ros2 run rs_motor_ros2 motor_control_node
 ```

@@ -17,6 +17,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(interface REQUIRED)
+
 
 
 # Generate messages
@@ -56,16 +58,17 @@ ament_target_dependencies(${PROJECT_NAME}_lib
 
 
 # Motor control test executable
-add_executable(rs_motor_ros2
+add_executable(motor_control_node
   src/main.cpp
 )
 # add_executable(enable_motor
 #   src/enable_motor.cpp
 # )
 
-ament_target_dependencies(rs_motor_ros2
+ament_target_dependencies(motor_control_node
   rclcpp
   std_msgs
+  interface
 )
 # ament_target_dependencies(enable_motor
 #   rclcpp
@@ -73,7 +76,7 @@ ament_target_dependencies(rs_motor_ros2
 #   can_msgs
 # )
 
-target_link_libraries(rs_motor_ros2
+target_link_libraries(motor_control_node
   ${PROJECT_NAME}_lib
 )
 # target_link_libraries(enable_motor
@@ -88,7 +91,7 @@ install(
 
 # Install targets
 install(
-  TARGETS ${PROJECT_NAME}_lib rs_motor_ros2
+  TARGETS ${PROJECT_NAME}_lib motor_control_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

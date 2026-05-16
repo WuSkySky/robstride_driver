@@ -11,7 +11,11 @@
 #include <vector>
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/float64_multi_array.hpp"
+#include "interface/msg/motor_state.hpp"
 
+//这个是C++ 的类型别名（type alias）
+//作用:将 interface::msg::MotorState 这个长名字简写为 MotorState
+using MotorState = interface::msg::MotorState; 
 
 
 
@@ -22,7 +26,7 @@ public:
         motor(RobStrideMotor("can0", 0xFF, 0x01, 2)) {
     
     // pub
-    pub_motor_state_array = this->create_publisher<std_msgs::msg::Float64MultiArray>("motor_state", 10);
+    pub_motor_state = this->create_publisher<MotorState>("motor_state", 10);
 
     // sub
     sub_position_command = this->create_subscription<std_msgs::msg::Float64>(
@@ -48,7 +52,8 @@ public:
   void excute_loop() {
     float position = 1.57f;
     float velocity = 0.0f;
-    while (true) {
+    //改成running，不是死循环了
+    while (running_) {
       // 自定义循环逻辑
       // 依次为速度，运控，位置模式, 电流，CSP位置
       position = target_position.load(std::memory_order_relaxed);
@@ -60,10 +65,14 @@ public:
           // motor.send_velocity_mode_command(5.0f);
           // motor.RobStrite_Motor_PosCSP_control(velocity, position);
 
-      // 打包成 MultiArray
-        std_msgs::msg::Float64MultiArray msg;
-        msg.data = {position_feedback, velocity_feedback, torque, temperature};   // 注意顺序：位置,速度,扭矩,温度
-        pub_motor_state_array->publish(msg);
+      // 发布消息
+      auto msg = MotorState();
+      msg.position = position_feedback;
+      msg.velocity = velocity_feedback;
+      msg.torque = torque;
+      msg.temperature = temperature;
+      pub_motor_state->publish(msg);
+
 
       std::this_thread::sleep_for(std::chrono::milliseconds(1)); // loop rate
     }
@@ -71,7 +80,7 @@ public:
 
 private:
 
-  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr pub_motor_state_array;
+  rclcpp::Publisher<MotorState>::SharedPtr pub_motor_state;
 
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr sub_position_command;
 
