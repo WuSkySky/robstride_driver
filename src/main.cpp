@@ -10,6 +10,10 @@
 #include <unistd.h>
 #include <vector>
 #include "std_msgs/msg/float64.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
+
+
+
 
 class MotorControlSample : public rclcpp::Node {
 public:
@@ -18,8 +22,8 @@ public:
         motor(RobStrideMotor("can0", 0xFF, 0x01, 2)) {
     
     // pub
-    pub_moter_state = this->create_publisher<std_msgs::msg::Float64>("motor_state", 10);
-    
+    pub_motor_state_array = this->create_publisher<std_msgs::msg::Float64MultiArray>("motor_state", 10);
+
     // sub
     sub_position_command = this->create_subscription<std_msgs::msg::Float64>(
         "motor_cmd_position", 10,
@@ -56,13 +60,18 @@ public:
           // motor.send_velocity_mode_command(5.0f);
           // motor.RobStrite_Motor_PosCSP_control(velocity, position);
 
+      // 打包成 MultiArray
+        std_msgs::msg::Float64MultiArray msg;
+        msg.data = {position_feedback, velocity_feedback, torque, temperature};   // 注意顺序：位置,速度,扭矩,温度
+        pub_motor_state_array->publish(msg);
+
       std::this_thread::sleep_for(std::chrono::milliseconds(1)); // loop rate
     }
   }
 
 private:
 
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr pub_moter_state;
+  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr pub_motor_state_array;
 
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr sub_position_command;
 

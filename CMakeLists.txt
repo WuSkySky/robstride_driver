@@ -17,13 +17,13 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
+
 
 # Generate messages
 # rosidl_generate_interfaces(${PROJECT_NAME}
-#   "msg/MotorFeedback.msg"
 #   DEPENDENCIES std_msgs
 # )
+
 
 # Create a ament index resource to make the package findable
 ament_export_dependencies(rosidl_default_runtime)
@@ -51,8 +51,8 @@ ament_target_dependencies(${PROJECT_NAME}_lib
   sensor_msgs
 )
 
-# rosidl_target_interfaces(${PROJECT_NAME}_lib 
-#   ${PROJECT_NAME} "rosidl_typesupport_cpp")
+#rosidl_target_interfaces(${PROJECT_NAME}_lib 
+#  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 
 # Motor control test executable
