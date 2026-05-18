@@ -25,7 +25,7 @@ endif()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/MotorState.msg"
-  # 如果将来用到其他消息类型，也在这里追加
+  "msg/MotorStateArray.msg"
   DEPENDENCIES std_msgs
 
 )
