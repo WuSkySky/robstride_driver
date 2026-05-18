@@ -34,11 +34,17 @@ public:
     pub_motor_states = this->create_publisher<MotorStateArray>("motor_state", 10);
 
     // sub
-    sub_position_command = this->create_subscription<std_msgs::msg::Float64>(
-        "motor_cmd_position", 10,
-        std::bind(&MotorControlSample::sub_position_command_callback,
+    sub_position_command1 = this->create_subscription<std_msgs::msg::Float64>(
+        "motor1_cmd_position", 10,
+        std::bind(&MotorControlSample::sub_position_command1_callback,
                 this,
                 std::placeholders::_1));
+    sub_position_command2 = this->create_subscription<std_msgs::msg::Float64>(
+        "motor2_cmd_position", 10,
+        std::bind(&MotorControlSample::sub_position_command2_callback,
+                this,
+                std::placeholders::_1));
+    
     
 
     motor_small.Get_RobStrite_Motor_parameter(0x7005);
@@ -72,7 +78,8 @@ public:
       //position = target_position.load(std::memory_order_relaxed);
       // 如果两个电机需要独立的目标位置，可以用两个原子变量分别控制
       // 简单起见，这里使用同一个 target_position 给两个电机
-      float target = target_position.load(std::memory_order_relaxed);
+      float target1 = target_position1.load(std::memory_order_relaxed);
+      float target2 = target_position2.load(std::memory_order_relaxed);
 
       //auto [position_feedback, velocity_feedback, torque, temperature] =
         //   motor.send_motion_command(0.0, position, velocity, 1.1f, 0.1f);
@@ -83,9 +90,9 @@ public:
       
         
        // 获取小电机状态
-        auto [pos_s, vel_s, tor_s, temp_s] = motor_small.send_motion_command(0.0, target, velocity_small, 1.1f, 0.1f);
+        auto [pos_s, vel_s, tor_s, temp_s] = motor_small.send_motion_command(0.0, target1, velocity_small, 1.1f, 0.1f);
         // 获取大电机状态
-        auto [pos_b, vel_b, tor_b, temp_b] = motor_big.send_motion_command(0.0, target, velocity_big, 1.1f, 0.1f);
+        auto [pos_b, vel_b, tor_b, temp_b] = motor_big.send_motion_command(0.0, target2, velocity_big, 1.1f, 0.1f);
 
       // 发布消息
       MotorStateArray msg; 
@@ -122,13 +129,21 @@ private:
   RobStrideMotor motor_big;     // ID=2 的大电机
   rclcpp::Publisher<MotorStateArray>::SharedPtr pub_motor_states;
 
-  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr sub_position_command;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr sub_position_command1;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr sub_position_command2;
 
-  std::atomic<float> target_position{0.0f};
 
-  void sub_position_command_callback(const std_msgs::msg::Float64::SharedPtr msg)
+  std::atomic<float> target_position1{0.0f};
+  std::atomic<float> target_position2{0.0f};
+
+  void sub_position_command1_callback(const std_msgs::msg::Float64::SharedPtr msg)
   {
-    target_position.store(msg->data,std::memory_order_relaxed);
+    target_position1.store(msg->data,std::memory_order_relaxed);
+  }
+
+  void sub_position_command2_callback(const std_msgs::msg::Float64::SharedPtr msg)
+  {
+    target_position2.store(msg->data,std::memory_order_relaxed);
   }
 
   std::thread worker_thread_;
