@@ -13,6 +13,7 @@ def generate_launch_description():
         ('/motor_state', '/motor_state_1'),
         ('/motor_cmd_position', '/motor_cmd_position_1')
         ],
+        output="screen",
          # 为第一个节点设置 motor_id 参数
         parameters=[
             {"motor_id": 1} 
@@ -28,6 +29,7 @@ def generate_launch_description():
         ('/motor_state', '/motor_state_2'),
         ('/motor_cmd_position', '/motor_cmd_position_2')
         ],
+        output="screen",
         parameters=[
             {"motor_id": 2} 
         ]
