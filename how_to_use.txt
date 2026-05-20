@@ -1,0 +1,57 @@
+# 1. 强行拉起并激活 can0 网卡（彻底解决 Network is down 报错）
+sudo ip link set can0 type can bitrate 1000000
+sudo ip link set can0 up
+sudo ifconfig can0 txqueuelen 100
+
+# 2. 进入你的 ROS 2 工作空间根目录
+cd ~/Code/robstride_driver
+
+# 3. 使用绝对正确的 ROS 2 包名 rs_motor_ros2 进行精准编译
+colcon build --packages-select rs_motor_ros2
+
+# 4. 生效刚刚编译出来的环境变量
+source ./install/setup.bash
+
+# 5. 启动双电机控制节点
+ros2 run rs_motor_ros2 motor_control_node
+
+
+
+
+cd ~/Code/robstride_driver
+source ./install/setup.bash
+
+# 监听统一的数组状态话题
+ros2 topic echo /motor_state
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------
+
+
+
+sudo ip link set can0 down
+sudo ip link set can0 type can bitrate 1000000
+sudo ip link set can0 up
+sudo ifconfig can0 txqueuelen 100
+cd ~/Code/robstride_driver
+colcon build --packages-select rs_motor_ros2
+cd ~/Code/robstride_driver
+source ./install/setup.bash
+ros2 run rs_motor_ros2 motor_control_node
+
+
+source ./install/setup.bash
+ros2 topic pub --once /motor_cmd_array std_msgs/msg/Float64MultiArray "{data: [1.57, 1.57]}"
