@@ -22,8 +22,18 @@ using MotorState = interface::msg::MotorState;
 class MotorControlSample : public rclcpp::Node {
 public:
   MotorControlSample()
-      : rclcpp::Node("motor_control_set_node"),
-        motor(RobStrideMotor("can0", 0xFF, 0x01, 2)) {
+      : rclcpp::Node("motor_control_set_node")
+        {
+    // 声明参数，并提供默认值      
+    this->declare_parameter<int>("motor_id", 0);
+    // 从参数服务器获取参数值
+    int motor_id = this->get_parameter("motor_id").as_int();
+    RCLCPP_INFO(this->get_logger(), "Motor ID: %d", motor_id);
+    // 可以根据 motor_id 来配置 motor 对象，例如：
+    // motor = RobStrideMotor("can0", 0xFF, motor_id, 2);
+    
+    
+    motor = std::make_unique<RobStrideMotor>("can0", 0xFF, motor_id, 2);
     
     // pub
     pub_motor_state = this->create_publisher<MotorState>("motor_state", 10);
@@ -35,15 +45,15 @@ public:
                 this,
                 std::placeholders::_1));
 
-    motor.Get_RobStrite_Motor_parameter(0x7005);
+    motor->Get_RobStrite_Motor_parameter(0x7005);
     usleep(1000);
-    motor.enable_motor();
+    motor->enable_motor();
     usleep(1000);
     worker_thread_ = std::thread(&MotorControlSample::excute_loop, this);
   }
 
   ~MotorControlSample() {
-    motor.Disenable_Motor(0);
+    motor->Disenable_Motor(0);
     running_ = false; // 停止线程
     if (worker_thread_.joinable())
       worker_thread_.join(); // 等待线程结束
@@ -59,7 +69,7 @@ public:
       position = target_position.load(std::memory_order_relaxed);
 
       auto [position_feedback, velocity_feedback, torque, temperature] =
-           motor.send_motion_command(0.0, position, velocity, 1.1f, 0.1f);
+           motor->send_motion_command(0.0, position, velocity, 1.1f, 0.1f);
           // motor.RobStrite_Motor_PosPP_control(velocity, 0.5f, position);
           //   motor.RobStrite_Motor_Current_control(-0.1);
           // motor.send_velocity_mode_command(5.0f);
@@ -94,7 +104,7 @@ private:
   std::thread worker_thread_;
   std::atomic<bool> running_ = true;
 
-  RobStrideMotor motor;
+  std::unique_ptr<RobStrideMotor> motor;
 };
 
 int main(int argc, char **argv) {
