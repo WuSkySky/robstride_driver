@@ -55,6 +55,7 @@ public:
     motor_big.enable_motor();
 
     usleep(1000);
+    // 启动控制线程，在这个线程里循环读取电机状态并发布，同时根据订阅的命令调整电机控制指令，实现电机的闭环控制
     worker_thread_ = std::thread(&MotorControlSample::excute_loop, this);
   }
 
@@ -132,7 +133,8 @@ private:
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr sub_position_command1;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr sub_position_command2;
 
-
+  // 使用原子变量存储目标位置，确保线程安全，一个线程负责更新目标位置（写入）
+  //另一个线程负责读取并执行控制指令（读取 target_position 并调用 motor.send_motion_command 来控制电机）
   std::atomic<float> target_position1{0.0f};
   std::atomic<float> target_position2{0.0f};
 
