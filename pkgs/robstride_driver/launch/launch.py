@@ -20,18 +20,18 @@ def generate_launch_description():
 )
     ld.add_action(node1)
     
-    # node2=Node(
-    #     package='rs_motor_ros2',
-    #     executable='motor_control_node',
-    #     name='motor_control_node2',
-    #     remappings=[
-    #     ('/motor_state', '/motor_state_2'),
-    #     ('/motor_cmd_position', '/motor_cmd_position_2')
-    #     ],
-    #     parameters=[
-    #         {"motor_id": 2} 
-    #     ]
-    # )
-    # ld.add_action(node2)
+    node2=Node(
+        package='rs_motor_ros2',
+        executable='motor_control_node',
+        name='motor_control_node2',
+        remappings=[
+        ('/motor_state', '/motor_state_2'),
+        ('/motor_cmd_position', '/motor_cmd_position_2')
+        ],
+        parameters=[
+            {"motor_id": 2} 
+        ]
+    )
+    ld.add_action(node2)
 
     return ld

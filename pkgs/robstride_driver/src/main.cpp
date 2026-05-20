@@ -25,7 +25,7 @@ public:
       : rclcpp::Node("motor_control_set_node")
         {
     // 声明参数，并提供默认值      
-    this->declare_parameter<int>("motor_id", 0);
+    this->declare_parameter<int>("motor_id", 1);
     // 从参数服务器获取参数值
     int motor_id = this->get_parameter("motor_id").as_int();
     RCLCPP_INFO(this->get_logger(), "Motor ID: %d", motor_id);
