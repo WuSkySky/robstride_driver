@@ -1,0 +1,42 @@
+cd ~/Code/robstride_driver
+colcon build --packages-select rs_motor_ros2
+source install/setup.bash
+ros2 launch rs_motor_ros2 motor_control.launch.py
+
+
+
+
+
+
+
+sudo modprobe can can_raw can_dev
+sudo ip link set can0 down
+sudo ip link set can0 type can bitrate 1000000
+sudo ip link set can0 up
+sudo ifconfig can0 txqueuelen 100
+
+cd ~/Code/robstride_driver
+colcon build --packages-select rs_motor_ros2 interface --symlink-install
+source install/setup.bash
+
+ros2 launch rs_motor_ros2 motor_demo.launch.py
+
+
+
+
+# 新开终端发控制指令
+cd ~/Code/robstride_driver
+source install/setup.bash
+
+ros2 topic pub --once /motor1_cmd_position std_msgs/msg/Float64 "{data: 1.57}"
+
+ros2 topic pub --once /motor2_cmd_position std_msgs/msg/Float64 "{data: 1.57}"
+
+
+
+
+
+# 保持你的 launch 运行（不要关）
+cd ~/Code/robstride_driver
+source install/setup.bash
+ros2 topic echo /motor_state

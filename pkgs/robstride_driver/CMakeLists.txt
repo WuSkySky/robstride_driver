@@ -58,8 +58,8 @@ ament_target_dependencies(${PROJECT_NAME}_lib
 
 
 # Motor control test executable
-add_executable(motor_control_node
-  src/main.cpp
+# 把 main.cpp 编译成一个程序，名字叫 motor_control_node
+add_executable(motor_control_node src/main.cpp
 )
 # add_executable(enable_motor
 #   src/enable_motor.cpp
@@ -98,9 +98,9 @@ install(
 )
 
 # Install launch files
-# install(
-#   DIRECTORY launch
-#   DESTINATION share/${PROJECT_NAME}
-# )
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
+)
 
 ament_package()
