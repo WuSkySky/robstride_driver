@@ -40,3 +40,35 @@ ros2 topic pub --once /motor2_cmd_position std_msgs/msg/Float64 "{data: 1.57}"
 cd ~/Code/robstride_driver
 source install/setup.bash
 ros2 topic echo /motor_state
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ros2 topic pub --once /motor1_node/cmd_position std_msgs/msg/Float64 "{data: 1.57}"
+ros2 topic pub --once /motor2_node/cmd_position std_msgs/msg/Float64 "{data: 1.57}"
+
+
+ros2 topic echo /motor1_node/state
